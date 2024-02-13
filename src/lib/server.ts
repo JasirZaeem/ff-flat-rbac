@@ -6,21 +6,25 @@ import {
 } from "fastify-type-provider-zod";
 import { Err, Ok, PromisedResult } from "./utils/result";
 import { REDACTED_CONFIG_KEYS } from "./config";
+import { healthRoutes } from "../modules/health/health.routes";
 
 export function buildServer() {
-	const app = Fastify({
+	const server = Fastify({
 		logger: {
 			level: "info",
 			redact: [...REDACTED_CONFIG_KEYS],
 		},
 	});
 
-	app.setValidatorCompiler(validatorCompiler);
-	app.setSerializerCompiler(serializerCompiler);
+	server.setValidatorCompiler(validatorCompiler);
+	server.setSerializerCompiler(serializerCompiler);
 
-	app.withTypeProvider<ZodTypeProvider>();
+	server.withTypeProvider<ZodTypeProvider>();
 
-	return app;
+	// Register routes
+	server.register(healthRoutes);
+
+	return server;
 }
 
 export async function stopServer(server: FastifyInstance) {
