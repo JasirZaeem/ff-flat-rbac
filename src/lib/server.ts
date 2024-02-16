@@ -1,12 +1,20 @@
-import Fastify, { FastifyInstance } from "fastify";
+import Fastify, {
+	type FastifyBaseLogger,
+	type FastifyInstance,
+	type FastifyRequest,
+	type RawReplyDefaultExpression,
+	type RawRequestDefaultExpression,
+	type RawServerDefault,
+} from "fastify";
 import {
-	ZodTypeProvider,
+	type ZodTypeProvider,
 	serializerCompiler,
 	validatorCompiler,
 } from "fastify-type-provider-zod";
-import { Err, Ok, PromisedResult } from "./utils/result";
-import { REDACTED_CONFIG_KEYS } from "./config";
+import { authRoutes } from "../modules/auth/auth.routes";
 import { healthRoutes } from "../modules/health/health.routes";
+import { REDACTED_CONFIG_KEYS } from "./config";
+import { Err, Ok, type PromisedResult } from "./utils/result";
 
 export function buildServer() {
 	const server = Fastify({
@@ -23,9 +31,28 @@ export function buildServer() {
 
 	// Register routes
 	server.register(healthRoutes);
+	server.register(authRoutes, {
+		prefix: "/api/v1/auth",
+	});
 
 	return server;
 }
+
+export type FastifyZodInstance = FastifyInstance<
+	RawServerDefault,
+	RawRequestDefaultExpression,
+	RawReplyDefaultExpression,
+	FastifyBaseLogger,
+	ZodTypeProvider
+>;
+
+export type FastifyZodRequest<
+	BodyType = never,
+	QueryType = never,
+> = FastifyRequest<{
+	Body: BodyType;
+	Querystring: QueryType;
+}>;
 
 export async function stopServer(server: FastifyInstance) {
 	server.log.info("Shutting down server");
@@ -37,14 +64,14 @@ export async function startServer(
 	server: FastifyInstance,
 	host: string,
 	port: number,
-): PromisedResult<FastifyInstance, unknown> {
+): PromisedResult<FastifyInstance, Error> {
 	try {
 		await server.listen({
 			host,
 			port,
 		});
 	} catch (error) {
-		return Err(error);
+		return Err(error as Error);
 	}
 
 	const signals = ["SIGINT", "SIGTERM"] as const;

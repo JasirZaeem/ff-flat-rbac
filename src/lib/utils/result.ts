@@ -1,12 +1,16 @@
+export type ResultOk<ValueType> = {
+	ok: true;
+	value: ValueType;
+};
+
+export type ResultError<ErrorType> = {
+	ok: false;
+	error: ErrorType;
+};
+
 export type Result<ValueType, ErrorType> =
-	| {
-			ok: true;
-			value: ValueType;
-	  }
-	| {
-			ok: false;
-			error: ErrorType;
-	  };
+	| ResultOk<ValueType>
+	| ResultError<ErrorType>;
 
 export type PromisedResult<ValueType, ErrorType> = Promise<
 	Result<ValueType, ErrorType>
@@ -36,5 +40,6 @@ export function match<ValueType, ErrorType, ReturnType>(
 	if (result.ok) {
 		return matcher.ok(result.value);
 	}
-	return matcher.error(result.error);
+
+	return matcher.error((result as ResultError<ErrorType>).error);
 }

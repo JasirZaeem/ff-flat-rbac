@@ -6,8 +6,18 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"all": true,
+			"style": {
+				"useNamingConvention": "off"
+			},
+			"nursery": {
+				"useImportRestrictions": "off"
+			}
 		}
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"ignore": ["./src/lib/db/types"]
 	},
 	"vcs": {
 		"enabled": true,

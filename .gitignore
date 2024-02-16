@@ -167,3 +167,7 @@ dist
 
 # Ignore scracth directories for experiments
 /scratch/
+
+# Ignore editor specific files
+.vscode/
+.idea/
