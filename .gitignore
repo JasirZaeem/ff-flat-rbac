@@ -171,3 +171,6 @@ dist
 # Ignore editor specific files
 .vscode/
 .idea/
+
+# In progress migration file
+migrations/current.sql
