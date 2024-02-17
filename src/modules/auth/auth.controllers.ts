@@ -56,6 +56,7 @@ export async function loginController(
 				secure: config.NODE_ENV === "production",
 				sameSite: CookieOptionSameSite.Strict,
 				expires: sessionResult.value.session.expires_at,
+				path: "/",
 			}),
 		)
 		.send();
@@ -65,6 +66,7 @@ export async function meController(
 	request: FastifyZodRequest,
 	reply: FastifyReply,
 ) {
+	request.log.info({ cookies: request.headers });
 	const sessionId = getCookieValue(request.headers.cookie ?? "", "sessionId");
 	if (!sessionId) {
 		return reply.status(401).send({ error: "Not logged in" });

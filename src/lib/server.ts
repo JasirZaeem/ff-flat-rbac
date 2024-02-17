@@ -11,9 +11,11 @@ import {
 	serializerCompiler,
 	validatorCompiler,
 } from "fastify-type-provider-zod";
+import { applicationRoutes } from "../modules/application/application.routes";
 import { authRoutes } from "../modules/auth/auth.routes";
 import { healthRoutes } from "../modules/health/health.routes";
 import { REDACTED_CONFIG_KEYS } from "./config";
+import type { ServiceUserId } from "./db/types/public/ServiceUser";
 import { Err, Ok, type PromisedResult } from "./utils/result";
 
 export function buildServer() {
@@ -34,6 +36,9 @@ export function buildServer() {
 	server.register(authRoutes, {
 		prefix: "/api/v1/auth",
 	});
+	server.register(applicationRoutes, {
+		prefix: "/api/v1/applications",
+	});
 
 	return server;
 }
@@ -46,11 +51,21 @@ export type FastifyZodInstance = FastifyInstance<
 	ZodTypeProvider
 >;
 
+declare module "fastify" {
+	export interface FastifyRequest {
+		user: {
+			id: ServiceUserId;
+		};
+	}
+}
+
 export type FastifyZodRequest<
-	BodyType = never,
-	QueryType = never,
+	BodyType = unknown,
+	ParamsType = unknown,
+	QueryType = unknown,
 > = FastifyRequest<{
 	Body: BodyType;
+	Params: ParamsType;
 	Querystring: QueryType;
 }>;
 

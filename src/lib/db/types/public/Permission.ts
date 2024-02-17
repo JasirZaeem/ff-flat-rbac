@@ -15,6 +15,8 @@ export default interface PermissionTable {
 
   name: ColumnType<string, string, string>;
 
+  description: ColumnType<string | null, string | null, string | null>;
+
   created_at: ColumnType<Date, Date | string | undefined, Date | string>;
 
   updated_at: ColumnType<Date, Date | string | undefined, Date | string>;
