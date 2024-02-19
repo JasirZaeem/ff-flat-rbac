@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { ApplicationId } from "../../lib/db/types/public/Application";
 
-const applicationIdSchema = z
+export const applicationIdSchema = z
 	.string()
 	.uuid()
 	.transform((value) => value as ApplicationId);
@@ -20,6 +20,7 @@ export const updateApplicationBodySchema = z
 		name: z.string().max(255).optional(),
 		description: z.string().max(1000).optional(),
 	})
+	.strict()
 	.refine((value) => {
 		if (Object.keys(value).length === 0) {
 			throw new Error("At least one field must be provided");

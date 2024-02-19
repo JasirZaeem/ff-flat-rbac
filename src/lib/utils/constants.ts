@@ -3,4 +3,5 @@ export enum ErrorCode {
 	InvalidCredentials = "InvalidCredentials",
 	NotLoggedIn = "NotLoggedIn",
 	ApplicationNotFound = "ApplicationNotFound",
+	PermissionNotFound = "PermissionNotFound",
 }

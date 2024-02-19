@@ -1,92 +1,76 @@
 import { db } from "../../lib/db";
 import type { ApplicationId } from "../../lib/db/types/public/Application";
+import type { PermissionId } from "../../lib/db/types/public/Permission";
 import type { ServiceUserId } from "../../lib/db/types/public/ServiceUser";
 import { ErrorCode } from "../../lib/utils/constants";
 import { Err, Ok } from "../../lib/utils/result";
 import { uuidv7 } from "../../lib/utils/uuidv7";
 import type {
-	CreateApplicationBody,
-	UpdateApplicationBody,
-} from "./application.schemas";
+	CreatePermissionBody,
+	UpdatePermissionBody,
+} from "./permission.schemas";
 
-export async function createApplication(
+export async function createPermission(
 	userId: ServiceUserId,
-	data: CreateApplicationBody,
+	applicationId: ApplicationId,
+	data: CreatePermissionBody,
 ) {
 	try {
-		const createdApplication = await db
-			.insertInto("application")
+		const createdPermission = await db
+			.insertInto("permission")
 			.values({
-				id: uuidv7() as ApplicationId,
+				id: uuidv7() as PermissionId,
 				owner_service_user_id: userId,
+				owner_application_id: applicationId,
 				name: data.name,
 				description: data.description,
 			})
 			.returning(["id", "created_at as createdAt"])
 			.executeTakeFirstOrThrow();
 
-		return Ok(createdApplication);
+		return Ok(createdPermission);
 	} catch (e) {
 		return Err(e);
 	}
 }
 
-export async function updateApplication(
+export async function updatePermission(
 	userId: ServiceUserId,
 	applicationId: ApplicationId,
-	data: UpdateApplicationBody,
+	permissionId: PermissionId,
+	data: UpdatePermissionBody,
 ) {
 	try {
-		const updatedApplication = await db
-			.updateTable("application")
+		const updatedPermission = await db
+			.updateTable("permission")
 			.set({
 				name: data.name,
 				description: data.description,
 			})
-			.where("id", "=", applicationId)
+			.where("id", "=", permissionId)
 			.where("owner_service_user_id", "=", userId)
+			.where("owner_application_id", "=", applicationId)
 			.where("deleted_at", "is", null)
 			.returning(["updated_at as updatedAt"])
 			.executeTakeFirst();
 
-		if (!updatedApplication) {
-			return Err(ErrorCode.ApplicationNotFound);
+		if (!updatedPermission) {
+			return Err(ErrorCode.PermissionNotFound);
 		}
 
-		return Ok(updatedApplication);
+		return Ok(updatedPermission);
 	} catch (e) {
 		return Err(e);
 	}
 }
 
-export async function getApplications(userId: ServiceUserId) {
-	try {
-		const applications = await db
-			.selectFrom("application")
-			.select([
-				"id",
-				"name",
-				"description",
-				"created_at as createdAt",
-				"updated_at as updatedAt",
-			])
-			.where("owner_service_user_id", "=", userId)
-			.where("deleted_at", "is", null)
-			.execute();
-
-		return Ok(applications);
-	} catch (e) {
-		return Err(e);
-	}
-}
-
-export async function getApplication(
+export async function getPermissions(
 	userId: ServiceUserId,
 	applicationId: ApplicationId,
 ) {
 	try {
-		const application = await db
-			.selectFrom("application")
+		const permissions = await db
+			.selectFrom("permission")
 			.select([
 				"id",
 				"name",
@@ -95,15 +79,42 @@ export async function getApplication(
 				"updated_at as updatedAt",
 			])
 			.where("owner_service_user_id", "=", userId)
-			.where("id", "=", applicationId)
+			.where("owner_application_id", "=", applicationId)
+			.where("deleted_at", "is", null)
+			.execute();
+
+		return Ok(permissions);
+	} catch (e) {
+		return Err(e);
+	}
+}
+
+export async function getPermission(
+	userId: ServiceUserId,
+	applicationId: ApplicationId,
+	permissionId: PermissionId,
+) {
+	try {
+		const permission = await db
+			.selectFrom("permission")
+			.select([
+				"id",
+				"name",
+				"description",
+				"created_at as createdAt",
+				"updated_at as updatedAt",
+			])
+			.where("owner_service_user_id", "=", userId)
+			.where("owner_application_id", "=", applicationId)
+			.where("id", "=", permissionId)
 			.where("deleted_at", "is", null)
 			.executeTakeFirst();
 
-		if (!application) {
-			return Err(ErrorCode.ApplicationNotFound);
+		if (!permission) {
+			return Err(ErrorCode.PermissionNotFound);
 		}
 
-		return Ok(application);
+		return Ok(permission);
 	} catch (e) {
 		return Err(e);
 	}
