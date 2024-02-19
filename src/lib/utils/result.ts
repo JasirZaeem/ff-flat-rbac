@@ -23,6 +23,8 @@ export function Ok<ValueType>(value: ValueType): Result<ValueType, never> {
 	};
 }
 
+export const OkVoid = () => Ok(undefined);
+
 export function Err<ErrorType>(error: ErrorType): Result<never, ErrorType> {
 	return {
 		ok: false,

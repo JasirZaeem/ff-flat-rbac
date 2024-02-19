@@ -4,4 +4,5 @@ export enum ErrorCode {
 	NotLoggedIn = "NotLoggedIn",
 	ApplicationNotFound = "ApplicationNotFound",
 	PermissionNotFound = "PermissionNotFound",
+	RoleNotFound = "RoleNotFound",
 }

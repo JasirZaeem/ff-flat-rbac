@@ -2,6 +2,7 @@ import { FastifyPluginOptions } from "fastify";
 import { authenticate } from "../../lib/hooks/authenticate";
 import type { FastifyZodInstance } from "../../lib/server";
 import { permissionRoutes } from "../permission/permission.routes";
+import { roleRoutes } from "../role/role.routes";
 import {
 	createApplicationController,
 	getApplicationController,
@@ -57,6 +58,8 @@ export function applicationRoutes(
 	});
 
 	server.register(permissionRoutes, { prefix: "/:applicationId/permissions" });
+
+	server.register(roleRoutes, { prefix: "/:applicationId/roles" });
 
 	done();
 }
