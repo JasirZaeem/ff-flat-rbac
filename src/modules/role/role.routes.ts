@@ -63,9 +63,6 @@ export function roleRoutes(
 		handler: getRoleController,
 	});
 
-	// TODO: Add route to add permissions to a role
-	// TODO: Add route to remove permissions from a role
-
 	server.register(rolePermissionRoutes, { prefix: "/:roleId/permissions" });
 
 	done();
