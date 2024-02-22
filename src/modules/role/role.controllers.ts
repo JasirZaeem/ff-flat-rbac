@@ -147,15 +147,19 @@ export async function addPermissionsToRoleController(
 	);
 
 	if (!addedPermissionResult.ok) {
+		if ((addedPermissionResult.error as DatabaseError)?.code === "23505") {
+			return reply.status(409).send({
+				error: "Role already has that permission",
+			});
+		}
+
 		request.log.error(addedPermissionResult.error);
 		return reply.status(500).send({
 			error: "Internal server error",
 		});
 	}
 
-	return reply.status(200).send({
-		updatedAt: addedPermissionResult.value,
-	});
+	return reply.status(200).send(addedPermissionResult.value);
 }
 
 export async function removePermissionFromRoleController(
