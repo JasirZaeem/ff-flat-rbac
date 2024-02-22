@@ -8,6 +8,7 @@ import {
 import {
 	createPermissionBodySchema,
 	createPermissionParamsSchema,
+	getPermissionParamsSchema,
 	getPermissionsParamsSchema,
 	updatePermissionBodySchema,
 	updatePermissionParamsSchema,
@@ -51,7 +52,7 @@ export function permissionRoutes(
 		method: "GET",
 		url: "/:id",
 		schema: {
-			params: updatePermissionParamsSchema,
+			params: getPermissionParamsSchema,
 		},
 		handler: getPermissionController,
 	});
