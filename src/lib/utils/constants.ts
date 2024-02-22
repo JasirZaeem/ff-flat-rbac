@@ -5,4 +5,5 @@ export enum ErrorCode {
 	ApplicationNotFound = "ApplicationNotFound",
 	PermissionNotFound = "PermissionNotFound",
 	RoleNotFound = "RoleNotFound",
+	UserNotFound = "UserNotFound",
 }
