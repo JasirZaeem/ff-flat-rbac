@@ -8,6 +8,8 @@ export const roleIdSchema = z
 	.uuid()
 	.transform((value) => value as RoleId);
 
+export const roleNameSchema = z.string().min(3).max(255);
+
 export const createRoleParamsSchema = z.object({
 	applicationId: applicationIdSchema,
 });
@@ -16,25 +18,19 @@ export type CreateRoleParams = z.infer<typeof createRoleParamsSchema>;
 
 export const createRoleBodySchema = z
 	.object({
-		name: z.string().max(255),
+		name: roleNameSchema,
 		description: z.string().max(1000).optional(),
 	})
 	.strict();
 
 export type CreateRoleBody = z.infer<typeof createRoleBodySchema>;
 
-export const updateRoleBodySchema = z
-	.object({
-		name: z.string().max(255).optional(),
-		description: z.string().max(1000).optional(),
-	})
-	.strict()
-	.refine((value) => {
-		if (Object.keys(value).length === 0) {
-			throw new Error("At least one field must be provided");
-		}
-		return true;
-	});
+export const updateRoleBodySchema = createRoleBodySchema.refine((value) => {
+	if (Object.keys(value).length === 0) {
+		throw new Error("At least one field must be provided");
+	}
+	return true;
+});
 
 export type UpdateRoleBody = z.infer<typeof updateRoleBodySchema>;
 
