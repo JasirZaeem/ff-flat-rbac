@@ -6,27 +6,26 @@ export const applicationIdSchema = z
 	.uuid()
 	.transform((value) => value as ApplicationId);
 
+export const applicationNameSchema = z.string().min(3).max(255);
+export type ApplicationName = z.infer<typeof applicationNameSchema>;
+
 export const createApplicationBodySchema = z
 	.object({
-		name: z.string().max(255),
+		name: applicationNameSchema,
 		description: z.string().max(1000).optional(),
 	})
 	.strict();
 
 export type CreateApplicationBody = z.infer<typeof createApplicationBodySchema>;
 
-export const updateApplicationBodySchema = z
-	.object({
-		name: z.string().max(255).optional(),
-		description: z.string().max(1000).optional(),
-	})
-	.strict()
-	.refine((value) => {
+export const updateApplicationBodySchema = createApplicationBodySchema.refine(
+	(value) => {
 		if (Object.keys(value).length === 0) {
 			throw new Error("At least one field must be provided");
 		}
 		return true;
-	});
+	},
+);
 
 export type UpdateApplicationBody = z.infer<typeof updateApplicationBodySchema>;
 
