@@ -8,11 +8,11 @@ export type ResultError<ErrorType> = {
 	error: ErrorType;
 };
 
-export type Result<ValueType, ErrorType> =
+export type Result<ValueType, ErrorType = unknown> =
 	| ResultOk<ValueType>
 	| ResultError<ErrorType>;
 
-export type PromisedResult<ValueType, ErrorType> = Promise<
+export type PromisedResult<ValueType, ErrorType = unknown> = Promise<
 	Result<ValueType, ErrorType>
 >;
 
@@ -44,4 +44,15 @@ export function match<ValueType, ErrorType, ReturnType>(
 	}
 
 	return matcher.error((result as ResultError<ErrorType>).error);
+}
+
+export function mapResult<ValueType, ErrorType, NewValueType>(
+	result: Result<ValueType, ErrorType>,
+	mapper: (value: ValueType) => NewValueType,
+): Result<NewValueType, ErrorType> {
+	if (result.ok) {
+		return Ok(mapper(result.value));
+	}
+
+	return result;
 }

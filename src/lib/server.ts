@@ -16,6 +16,7 @@ import { authRoutes } from "../modules/auth/auth.routes";
 import { healthRoutes } from "../modules/health/health.routes";
 import { REDACTED_CONFIG_KEYS } from "./config";
 import type { ServiceUserId } from "./db/types/public/ServiceUser";
+import { initDb } from "./utils/initDb";
 import { Err, Ok, type PromisedResult } from "./utils/result";
 
 export function buildServer() {
@@ -79,14 +80,19 @@ export async function startServer(
 	server: FastifyInstance,
 	host: string,
 	port: number,
-): PromisedResult<FastifyInstance, Error> {
+): PromisedResult<FastifyInstance> {
 	try {
+		const initResult = await initDb();
+		if (!initResult.ok) {
+			return Err(initResult.error);
+		}
+
 		await server.listen({
 			host,
 			port,
 		});
 	} catch (error) {
-		return Err(error as Error);
+		return Err(error);
 	}
 
 	const signals = ["SIGINT", "SIGTERM"] as const;
